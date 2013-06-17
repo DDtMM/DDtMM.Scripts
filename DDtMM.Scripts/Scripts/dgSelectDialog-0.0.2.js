@@ -1,21 +1,17 @@
 ﻿/*
 options:
-nodes: object with nodes.
-dataTemplate: default dataTemplate.
-node properties:
-dataTemplate (optional): jquery object to clone.  if none is provide, the parents' dataTemplate is used
-children: an array of child nodes (optional)
-id: node id
-value: either a primitave value, or object.
+Displays a select dialog
+IE bugginess with dialog.
 */
 $.widget("dg.selectDialog", {
 
     options: {
-        values: [ ],
+        values: [],
         value: '',
         maxValues: 20,
         title: 'Select',
         okText: 'ok',
+        cancelText: 'close',
         description: 'Select one...',
         inputID: ''
     },
@@ -27,7 +23,7 @@ $.widget("dg.selectDialog", {
         $(this.element).click(function () { $(this).selectDialog('show'); });
     },
 
-    show: function() {
+    show: function () {
         var self = this;
         var options = this.options;
         this.$dialogElement = $('<div />', { title: options.title, 'class': 'dg-selectdialog' }).append(
@@ -38,28 +34,30 @@ $.widget("dg.selectDialog", {
             ])
         );
 
-        
+
         this.result = { type: 'cancelled', value: this.options.value };
 
 
         this.$dialogElement.dialog({
             width: 'auto',
             modal: true,
-            buttons: [{ text: options.okText, click: function () { self._onSelectConfirmed(arguments); } }],
-            close: function () { self._onDialogClosed(); }
+            buttons: [
+                { text: options.cancelText, click: function () { self._onCancelled(); } },
+                { text: options.okText, click: function () { self._onConfirmed(arguments); } }],
+            close: function (ev) { self._onConfirmed(ev); }
         });
 
         this.$input.autocomplete();
-        this.$input.keyup(function (ev) { if (ev.keyCode == 13) self._onSelectConfirmed(ev); });
+        this.$input.keyup(function (ev) { if (ev.keyCode == 13) self._onConfirmed(ev); });
         this.$itemsList.selectable({
             selected: function (ev, elem) { self.$input.val(elem.selected.innerHTML); }
         });
-        this.$itemsList.on('dblclick', function (ev) { self._onSelectConfirmed(ev); });
+        this.$itemsList.on('dblclick', function (ev) { self._onConfirmed(ev); });
         this.isInitialized = true;
         this._onValuesChanged();
     },
 
-    _onSelectConfirmed: function (ev) {
+    _onConfirmed: function (ev) {
         var options = this.options;
 
         var value = this.$input.val().trim();
@@ -71,7 +69,7 @@ $.widget("dg.selectDialog", {
                 break;
             }
         }
-        
+
         options.value = value;
         options.values.unshift(value);
 
@@ -84,10 +82,10 @@ $.widget("dg.selectDialog", {
         this.result = { type: 'ok', value: options.value };
         this.$dialogElement.dialog('close');
         this._trigger('dialogOk', ev, this.result);
-        
+
     },
 
-    _onDialogClosed: function (ev) {
+    _onCancelled: function (ev) {
         if (this.isInitialized) {
             this.isInitialized = false;
             this.$dialogElement.remove();
@@ -96,7 +94,7 @@ $.widget("dg.selectDialog", {
         }
     },
 
-    _onValuesChanged: function() {
+    _onValuesChanged: function () {
         if (this.isInitialized) {
             var values = this.options.values;
             values.splice(this.options.maxValues - 1, values.length - this.options.maxValues);
@@ -109,13 +107,13 @@ $.widget("dg.selectDialog", {
     },
 
     _setOption: function (key, value) {
-        
+
         this._super(key, value);
         if (key == 'value') this._onValuesChanged();
     },
 
     destroy: function () {
-        this._onDialogClosed();
+        this._onCancelled();
 
         // call the base destroy function
         $.Widget.prototype.destroy.call(this);
