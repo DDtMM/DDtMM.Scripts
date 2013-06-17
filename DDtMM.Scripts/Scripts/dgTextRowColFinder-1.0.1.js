@@ -36,7 +36,7 @@ var TextRowColFinder = function (text) {
         else if (charIndex >= this.lineStarts[high]) foundRow = high;
         else if (startingLow == startingHigh) foundRow = startingLow;
 
-        while (foundRow === null) {
+        while (foundRow == null) {
             mid = Math.floor((low + high) / 2);
             if (charIndex >= this.lineStarts[mid]) {
                 if (charIndex < this.lineStarts[mid + 1]) foundRow = mid;
@@ -52,4 +52,4 @@ var TextRowColFinder = function (text) {
         return this.lineStarts[row] + col;
     };
 
-}).call(textRowColFinder.prototype);
+}).call(TextRowColFinder.prototype);
