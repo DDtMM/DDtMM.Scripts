@@ -252,7 +252,7 @@ var eventManager = (function () {
             sourceIndex = source[SOURCE_ID];
         }
         
-        if (!sourceIndex) {
+        if (sourceIndex == null) {
             sources.push(events = {});
             sourceIndex = sources.length - 1;
 
