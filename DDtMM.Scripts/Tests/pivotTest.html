@@ -1,0 +1,107 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+</head>
+<body>
+    <table id="report">
+    <tr>
+        <th >&nbsp;</th><th>H1</th><th >h2</th>
+        <th >h3</th><th>Total</th>
+    </tr>
+    <tr>
+        <td >R1</td><td>2</td><td>32</td><td>1</td><td ></td>
+    </tr>
+    <tr>
+        <td >R2</td><td>1</td><td>4</td><td>2</td><td ></td>
+    </tr>
+     <tr>
+        <td >R3</td><td>1</td><td>5.2</td><td>5</td><td ></td>
+    </tr>
+     <tr>
+        <td >R4</td><td>1.5</td><td>5</td><td>5</td><td ></td>
+    </tr>
+     <tr>
+        <td >R5</td><td>100</td><td>5</td><td>15</td><td ></td>
+    </tr>
+     <tr>
+        <td >Total</td><td ></td><td ></td><td ></td><td></td>
+    </tr>    
+</table>
+<button id="pivot">pivot</button>
+    <script src="/Scripts/required/jquery-1.10.1.js"></script>
+    <script>
+        $(document).ready({
+
+        });
+        $('#pivot').click(function () {
+            var saveElems = [],
+               i = 0, j = 0, $tbl, $row, colMax = 0, rowMax;
+
+            $tbl = $('#report');
+            $('#report tr').each(function () {
+                saveElems[i] = [];
+                j = 0;
+                $(this).children().each(function () {
+                    saveElems[i][j] = this;
+                    j++
+                });
+                i++;
+            });
+
+            rowMax = saveElems.length;
+            for (var i = 0, il = rowMax; i < il; i++) {
+                colMax = Math.max(colMax, saveElems[i].length);
+            }
+            $tbl.children().remove();
+
+            for (var i = 0, il = colMax; i < il; i++) {
+                $tbl.append($row = $('<tr />'));
+                for (var j = 0, jl = rowMax; j < jl; j++) {
+                    if (saveElems[j][i]) $row.append(saveElems[j][i]);
+                }
+            }
+            computeTotals();
+        });
+
+        function computeTotals() {
+            var saveValues = [],
+              i = 0, j = 0, cellValue, colValue, rowTotals = [], colTotals = [];
+
+            $('#report tr').not(':first, :last').each(function () {
+                saveValues[i] = [];
+                j = 0;
+                $(this).children().not(':first, :last').each(function () {
+                    saveValues[i][j] = this.innerHTML;
+                    j++
+                });
+                i++;
+            });
+
+            for (var k = 0, kl = saveValues.length; k < kl; k++) {
+                rowTotals[k] = 0;
+                for (var l = 0, ll = saveValues[k].length; l < ll; l++) {
+                    cellValue = parseFloat(saveValues[k][l]);
+                    colTotals[l] = cellValue + ((colValue = colTotals[l]) ? colValue : 0);
+                    rowTotals[k] = cellValue + rowTotals[k];
+                }
+            }
+
+            i = 0;
+            $('#report tr:not(:first, :last)').each(function() {
+                $(this).children(':last').html(rowTotals[i]);
+                i++;
+            });
+
+            i = 0;
+            $('#report tr:last').children().not(':first, :last').each(function () {
+                console.log(colTotals[i]);
+                this.innerHTML = colTotals[i];
+                i++;
+            });
+        }
+
+        computeTotals();
+    </script>
+</body>
+</html>

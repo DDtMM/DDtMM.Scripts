@@ -1,0 +1,146 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+    <link href="../Content/themes/base/jquery.ui.all.css" rel="stylesheet" />
+</head>
+<body>
+    <div>
+        <input id="tags" type="text" />
+        <input id="noresults" type="text" />
+    </div>
+  
+    <script src="/Scripts/required/jquery-1.10.1.js"></script>
+    <script src="../Scripts/Required/jquery-ui.js"></script>
+    <script>
+
+        $(function () {
+            var availableTags = ['Bird', 'Song', 'Happy'];
+            $('#noresults').autocomplete({
+                source: function (request, response) {
+                    var responses = $.ui.autocomplete.filter(availableTags, request.term);
+                    if (responses.length == 0) responses.push('No Result');
+                    response(responses);
+
+                },
+                response: function (event, ui)
+                {
+                    if (ui.content.length == 0) {
+                        console.log('No results');
+                    }
+                },
+                select: function (event, ui) {
+                    return (ui.item.value != 'No Result');
+                }
+            });
+
+            function split(val) {
+                return val.split(/,\s*/);
+            }
+
+            // removes the last term from the array, and adds newValue if given
+            function removeLastTerm(val, newValue) {
+                var terms = split(val);
+                terms.pop();
+                if (newValue) {
+                    terms.push(newValue);
+                }
+                terms.push('');
+                return terms.join(', ');;
+            }
+            
+            // filter from start position from:
+            // http://blog.miroslavpopovic.com/jqueryui-autocomplete-filter-words-starting-with-term
+            function filterFromStart(array, term) {
+                var matcher = new RegExp('^' + $.ui.autocomplete.escapeRegex(term), 'i');
+                return $.grep(array, function (value) {
+                    return matcher.test(value.label || value.value || value);
+                });
+            }
+            function filterExact(array, term) {
+                var matcher = new RegExp('^' + $.ui.autocomplete.escapeRegex(term) + '$', 'i');
+                return $.grep(array, function (value) {
+                    return matcher.test(value.label || value.value || value);
+                });
+            }
+            $('#tags')
+            // don't navigate away from the field on tab when selecting an item
+            .bind('keydown', function (event) {
+                if (event.keyCode === $.ui.keyCode.TAB &&
+                $(this).data('ui-autocomplete').menu.active) {
+                    event.preventDefault();
+                }
+            })
+            .autocomplete({
+                minLength: 0,
+                source: function (request, response) {
+                    var terms = split(request.term),
+                        lastTrimmed = false,
+                        lastTerm,
+                        originalMaxIndex = terms.length - 1,
+                        filteredMaxIndex;
+                    console.log(this);
+                    if (originalMaxIndex >= 0) {
+                        // remove any terms that don't match exactly
+                        for (var i = originalMaxIndex - 1; i >= 0; i--) {
+                            if (filterExact(availableTags, terms[i]).length == 0) {
+                                terms.splice(i, 1);
+                            }
+                        }
+
+                        filteredMaxIndex = terms.length - 1;
+                        // trim the last term until it matches something or is emty
+                        lastTerm = terms[filteredMaxIndex];
+                        while (lastTerm.length != 0 &&
+                            filterFromStart(availableTags, lastTerm).length == 0) {
+                            lastTerm = lastTerm.substr(0, lastTerm.length - 1);
+                            lastTrimmed = true;
+                        }
+
+                        if (lastTrimmed) {
+                            // add modified LastTerm or reduce terms array
+                            if (lastTerm.length == 0) {
+                                terms.splice(filteredMaxIndex--, 1);
+                                terms.push('');
+                            }
+                            else terms[filteredMaxIndex] = lastTerm;
+                        }
+
+                        console.log(terms);
+                        if (filteredMaxIndex >= 0) {
+                            // only execute if we've removed something
+                            if (filteredMaxIndex < originalMaxIndex || lastTrimmed) {
+                                this.element.val(terms.join(','));
+                            }
+                        } else {
+                            this.element.val(request.term);
+                        }
+
+                        console.log(lastTerm);
+                        if (this.options.minLength <= lastTerm.length) {
+                            response(filterFromStart(availableTags, lastTerm));
+                        }
+                        else {
+                            response([]);
+                        }
+                    }
+                    else {
+                        response(filterFromStart(availableTags, ''));
+                    }
+                     
+                },
+                focus: function () {
+                    // prevent value inserted on focus
+                    return false;
+                },
+                select: function (event, ui) {
+                    // add the selected value to the input.
+                    this.value = removeLastTerm(this.value, ui.item.value);
+                    return false;
+                }
+            });
+        });
+
+    </script>
+</body>
+</html>
