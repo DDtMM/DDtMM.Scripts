@@ -1,0 +1,21 @@
+﻿body
+{
+    font-family: Helvitica, sans-serif
+}
+
+div
+{
+    padding: 10px;
+    border: 1px green solid;
+}
+
+table
+{
+    margin: 5px 0px;
+    border-collapse: collapse;
+}
+table td
+{
+    padding: 5px;
+    border: 1px solid blue;
+}
