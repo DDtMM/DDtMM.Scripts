@@ -4,15 +4,25 @@ License: Freeware
 Description:
 A stack with lmited size.  Loops around the stack
 ***/
-var LimitedStack = function (size) {
+var LimitedStack = function (size, initialValues) {
     this._size = size;
     this._stackArray = new Array(this._size);
 
     // the index of the top of stack, if -1 stack is empty
-    this._topIndex = -1; 
+    this._topIndex = -1;
     // the index where the stack begins.
     this._bottomIndex = 0;
-    // length of stack
+
+    if (initialValues && initialValues.length) {
+        if (initialValues.length >= this._size) {
+            initialValues.splice(this._size, initialValues.length - this._size);
+            this._stackArray = initialValues;
+            this._topIndex = this._size - 1;
+        } else {
+            this._stackArray = initialValues.concat(this._stackArray.slice(this._size - initialValues.length));
+            this._topIndex = initialValues.length - 1;
+        }
+    }
 
 };
 
@@ -27,7 +37,7 @@ var LimitedStack = function (size) {
         return indexValue;
     },
     // makes the stack empty by resetting indices.
-    this.empty = function() {
+    this.empty = function () {
         this._topIndex = -1;
         this._bottomIndex = 0;
     },
@@ -50,7 +60,7 @@ var LimitedStack = function (size) {
         }
     },
     // returns last item in stack. 
-    this.peek = function() {
+    this.peek = function () {
         if (!this.isEmpty()) {
             return this._stackArray[this._topIndex];
         }
@@ -94,7 +104,7 @@ var LimitedStack = function (size) {
     },
 
     // returns a copy of the values
-    this.getValues = function() {
+    this.getValues = function () {
         if (this.isEmpty()) return [];
         else if (this._topIndex >= this._bottomIndex) {
             return this._stackArray.slice(this._bottomIndex, this._topIndex + 1);
@@ -105,7 +115,7 @@ var LimitedStack = function (size) {
     },
 
     // does the stack have no values
-    this.isEmpty = function() {
+    this.isEmpty = function () {
         return (this._topIndex == -1);
     },
 
@@ -115,7 +125,5 @@ var LimitedStack = function (size) {
         return (this.isEmpty()) ? 0 :
             this._topIndex - this._bottomIndex + ((this._topIndex >= this._bottomIndex) ? 0 : this._size) + 1;
     }
-
-
 
 }).call(LimitedStack.prototype);
