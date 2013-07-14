@@ -16,17 +16,17 @@
     <!-- jquery -->
     <script src="../Scripts/_Required/jquery-1.10.1.js"></script>
     <script src="../Scripts/_Required/jquery-ui.js"></script>
-    <script src="../Scripts/DataStructures/dgQry-0.0.2.js"></script>
+    <script src="../Scripts/DataStructures/dgQry-0.0.3.js"></script>
     <script>
         $(function () {
             var a1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
             var a2 = [2, 4, 6, 8, 9, 10];
-            var b, c, d;
+            var b = dgQry([2, 4, 6, 8, 9, 10, 11]);
             var e = { a: 1, b: 2, c: 3, d: 4 };
 
-            console.log(b = dgQry(a1).find(function (value) { return (value % 2 == 0); }));
-            console.log(dgQry(a1).exclude(function (value) { return (value % 2 == 0); }).array);
-            console.log(b.sum());
+            //console.log(b = dgQry(a1).find(function (value) { return (value % 2 == 0); }));
+            //console.log(dgQry(a1).exclude(function (value) { return (value % 2 == 0); }).array);
+            console.log(b.sum(function (value) { return (value % 2 == 0); }));
             console.log(b.product());
             console.log(b.avg());
             console.log(dgQry(a1).sum(function (value) { return (value % 2 == 1); }));
