@@ -1,0 +1,47 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Test</title>
+    <link href="../Content/Test.css" rel="stylesheet" />
+</head>
+<body>
+    <div id="div1"><span>This is #div1.</span></div>
+    <table id="tbl1">
+        <tbody>
+            <tr><td>#tbl1.r1c1</td><td>#tbl1.r1c2</td></tr>
+            <tr><td>#tbl1.r1c1</td><td>#tbl1.r2c2</td></tr>
+        </tbody>
+    </table>
+
+    <!-- jquery -->
+    <script src="../Scripts/_Required/jquery-1.10.1.js"></script>
+    <script src="../Scripts/_Required/jquery-ui.js"></script>
+    <script src="../Scripts/DataStructures/dgQry-0.0.2.js"></script>
+    <script>
+        $(function () {
+            var a1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+            var a2 = [2, 4, 6, 8, 9, 10];
+            var b, c, d;
+            var e = { a: 1, b: 2, c: 3, d: 4 };
+
+            console.log(b = dgQry(a1).find(function (value) { return (value % 2 == 0); }));
+            console.log(dgQry(a1).exclude(function (value) { return (value % 2 == 0); }).array);
+            console.log(b.sum());
+            console.log(b.product());
+            console.log(b.avg());
+            console.log(dgQry(a1).sum(function (value) { return (value % 2 == 1); }));
+            console.log(dgQry(a1).union(a2));
+            console.log(dgQry(a1).intersect(a2));
+            console.log(dgQry(a1).except(a2).toObject());
+            console.log(dgQry(a1).any(function (value) { return (value % 2 == 1); }));
+            console.log(dgQry(a1).all(function (value) { return (value % 2 == 1); }));
+            console.log(dgQry(b).all(function (value) { return (value % 2 == 0); }));
+            console.log(dgQry(e).find(function (value) { return (value % 2 == 0); }).toObject());
+            console.log(a1);
+            console.log(a2);
+            console.log(dgQry(a1).crossJoin(a2));
+        });
+
+    </script>
+</body>
+</html>

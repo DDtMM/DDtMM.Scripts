@@ -120,7 +120,7 @@
     <Content Include="Content\themes\base\minified\jquery.ui.tabs.min.css" />
     <Content Include="Content\themes\base\minified\jquery.ui.theme.min.css" />
     <Content Include="Content\themes\base\minified\jquery.ui.tooltip.min.css" />
-    <Content Include="Scripts\DataStructures\dgArrayDecorators-1.0.0.js" />
+    <Content Include="Scripts\DataStructures\dgQry-0.0.1.js" />
     <Content Include="Scripts\DataStructures\dgAssociativeArray-1.0.0.js" />
     <Content Include="Scripts\Plugins\dgBlocks-1.0.2.js" />
     <Content Include="Scripts\Plugins\dgDocs-0.0.3.js" />
@@ -135,6 +135,7 @@
     <Content Include="Scripts\_Required\jquery-1.10.1.js" />
     <Content Include="Scripts\_Required\jquery-2.0.2.js" />
     <Content Include="Scripts\_Required\jquery-ui.js" />
+    <Content Include="Tests\dgQryTest.html" />
     <Content Include="Tests\_testTemplate.html" />
     <Content Include="Web.config" />
   </ItemGroup>
