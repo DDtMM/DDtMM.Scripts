@@ -1,0 +1,31 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Test</title>
+    <link href="../Content/Test.css" rel="stylesheet" />
+</head>
+<body id="body">
+    <div id="div1" style="width:200px"><span>This is #div1.</span></div>
+    <div id="div2" style="width:100px"><span>This is #div1.</span></div>
+    
+
+    <!-- jquery -->
+    <script src="../Scripts/Frameworks/dgTransimate-0.0.1.js"></script>
+    <script src="../Scripts/_Required/jquery-1.10.1.js"></script>
+    <script src="../Scripts/_Required/jquery-ui.js"></script>
+    <script>
+        window.onload = function (e) {
+            //transimate('body').prop('perspectiveOrigin', '50% 50%');
+            transimate('div1').add('translate(120px, 50px)').add('rotate(20deg)');
+            transimate('div2').prop('transformStyle', 'preserve-3d')
+                .add('perspective( 600px ) translate(120px, 50px)').add('rotateY(52deg)');
+
+            //transimate('div2').animate('rotateY(730deg)', 2500, function () {
+            //    this.animate('translateX(1000px) rotateY(720deg)', 2000);
+            //});
+            transimate('div2').animate('scale3d(2, 2, 1) translateX(200px) rotateY(720deg)', 2000);
+        }
+ 
+    </script>
+</body>
+</html>

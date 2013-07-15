@@ -7,16 +7,10 @@ Adds functions to array
 (function () {
     // array keys
     var
-        // predicate info predicate
-        PI_PRED = 0,
-        // predicate info parameter
-        PI_PARAM = 1,
         // aggregate init value or function
         AGG_INIT = 0,
         // aggregate function
-        AGG_FUNC = 1,
-        // aggregate param
-        AGG_PARAM = 2;
+        AGG_FUNC = 1;
 
     // predefined predicates
     var predicates = {
@@ -148,8 +142,8 @@ Adds functions to array
         this.aggregateQueue = [];
 
         if (source.constructor == dgQry) {
-            this.array = source.array;
-            this.keys = source.keys;
+            this.array = source.array.slice(0);
+            this.keys = (source.keys) ? source.keys.slice(0) : null;
             this.collectionModifier = source.collectionModifier;
             
         }
@@ -178,76 +172,87 @@ Adds functions to array
         this.predicateQueue = [];
         this.aggregateQueue = [];
         this.collectionModifier = arrayModifiers;
-        this._lastAggResults = [];
 
         /*****
         Filters
         ******/
 
         // returns an array of all found matches
-        this.where = function (predicate, predicateParam) {
-            this.predicateQueue.push([predicate, predicateParam]);
+        this.where = function (predicate) {
+            this.predicateQueue.push(predicate);
 
             return this;
         }
 
 
         this.go = function () {
-            var result = this.createNewOfSameType(),
+            var result = {
+                    // result from aggregate functions
+                    agg: [],
+                    // new dgQuery with filtered results
+                    filtered: this.createNewOfSameType()
+                },
                 executionSteps = [],
                 continueProcessing, execution;
  
 
-            if (this.predicateQueue.length) executionSteps.push(this._goProcessPredicates);
-            if (this.aggregateQueue.length) {
-                this._goInitAggregates();
-                executionSteps.push(this._goProcessAggregates);
+            if (this.predicateQueue.length) {
+                executionSteps.push(this._goProcessPredicates);
+                executionSteps.push(this._goAddValidItem);
             }
+            else {
+                result.filtered = new dgQry(this);
+            }
+            if (this.aggregateQueue.length) {
+                this._goInitAggregates(result);
+                executionSteps.push(this._goProcessAggregates);
+            } 
             
-
             for (var i = 0, il = this.array.length; i < il; i++) {
                 value = this.array[i];
                 key = this.getKey(i);
+
                 for (var j = 0, jl = executionSteps.length; j < jl; j++) {
                     // keep processing steps until one returns false.
-                    if (!executionSteps[j].call(this, value, key)) break;
+                    if (!executionSteps[j].call(this, result, value, key)) break;
                 }
+
             }
 
             this.predicateQueue = [];
             this.aggregateQueue = [];
+
+            return result;
         }
 
-        this._goInitAggregates = function () {
+        this._goInitAggregates = function (result) {
             var valOrFunc;
 
-            this._lastAggResults = [];
-
             for (var i = 0, il = this.aggregateQueue.length; i < il; i++) {
-                this._lastAggResults.push(
+                result.agg.push(
                     (isFunction(valOrFunc = this.aggregateQueue[i][AGG_INIT])) ?
-                    valOrFunc(predicate) : valOrFunc);
+                    valOrFunc() : valOrFunc);
             }
         }
 
-        this._goProcessPredicates = function (value, key) {
-            var predInfo;
+        this._goProcessPredicates = function (result, value, key) {
             for (var i = 0, il = this.predicateQueue.length; i < il; i++) {
-                predInfo = this.predicateQueue[i];
-                if (!predInfo[PI_PRED](value, key, predInfo[PI_PARAM])) {
-                    this.removeItem(key);
+                if (!this.predicateQueue[i](value, key)) {
                     return false;
                 }
             }
             return true;
         }
 
-        this._goProcessAggregates = function (value, key) {
-            var predInfo;
-            for (var i = 0, il = this._lastAggResults.length; i < il; i++) {
-                aggInfo = this.aggregateQueue[i];
-                this._lastAggResults[i] =
-                    aggInfo[AGG_FUNC](this._lastAggResults[i], value, aggInfo[AGG_PARAM]);
+        this._goAddValidItem = function (result, value, key) {
+            result.filtered.addItem(value, key);
+            return true;
+        }
+
+        this._goProcessAggregates = function (result, value, key) {
+            var aggInfo;
+            for (var i = 0, il = result.agg.length; i < il; i++) {
+                result.agg[i] = this.aggregateQueue[i][AGG_FUNC](result.agg[i], value);
             }
             return true;
         }
@@ -360,35 +365,41 @@ Adds functions to array
         /********
         boolean value functions
         **********/
-        this.all = function (predicate, predicateParam) {
-            return (!this.findFirst(predicates.negate(predicate), predicateParam) || false);
+        this.all = function (predicate) {
+            return (!this.findFirst(predicates.negate(predicate)) || false);
         }
 
-        this.any = function (predicate, predicateParam) {
-            return (this.findFirst(predicate, predicateParam) && true);
+        this.any = function (predicate) {
+            return (this.findFirst(predicate) && true);
         }
 
         this.contains = function (item) {
-            return !predicates.inArray(item, 0, result);
+            return predicates.inArray(item, 0, this.go().filtered.array);
         }
 
         /*********
         value functions
         **********/
         // return the first item that causes predicate to return true
-        this.findFirst = function (predicate, predicateParam) {
+        this.findFirst = function (predicate) {
+            var filtered = this.go().filtered;
 
-            for (var i = 0, il = this.array.length; i < il; i++) {
-                if (predicate(this.array[i], this.getKey(i), predicateParam)) return this.array[i];
+            predicate = predicates.defaultIfNull(predicate);
+
+            for (var i = 0, il = filtered.array.length; i < il; i++) {
+                if (predicate(filtered.array[i], filtered.getKey(i))) return filtered.array[i];
             }
             return null;
         }
 
         // return the last item that causes predicate to return true
-        this.findLast = function (predicate, predicateParam) {
+        this.findLast = function (predicate) {
+            var filtered = this.go().filtered;
+
+            predicate = predicates.defaultIfNull(predicate);
 
             for (var i = this.array.length - 1; i >= 0; i--) {
-                if (predicate(this.array[i], this.getKey(i), predicateParam)) return this.array[i];
+                if (predicate(filtered.array[i], filtered.getKey(i))) return filtered.array[i];
             }
             return null;
         }
@@ -400,65 +411,64 @@ Adds functions to array
         // executes an aggregate function on an array.
         // init: function(predicate) or value
         // func: aggregate function
-        // funcParam: object or value.
-        this.addAggregate = function (init, func, predicate, funcParam, predParam) {
+        this.addAggregate = function (init, func, predicate) {
             if (predicate) {
-                this.where(predicate, predParam);
+                this.predicateQueue.push(predicate);
             }
-            this.aggregateQueue.push([init, func, funcParam]);
+            this.aggregateQueue.push([init, func]);
             return this;
         }
 
-        this.aggGo = function () {
-            this.go();
-            return this._lastAggResults[0];
-        }
-  
 
         // returns the count of all the values that match evalutor
         this.count = function (predicate) {
-            return this.addAggregate(0, aggFuncs.count, predicate).aggGo();
+            return this.addAggregate(0, aggFuncs.count, predicate).go().agg[0];
         }
 
         // sums all values
         this.sum = function (predicate) {
-            return this.addAggregate(0, aggFuncs.sum, predicate).aggGo();
+            return this.addAggregate(0, aggFuncs.sum, predicate).go().agg[0];
         }
 
         // product of all values
         this.product = function (predicate) {
-            return this.addAggregate(1, aggFuncs.product, predicate).aggGo();
+            return this.addAggregate(1, aggFuncs.product, predicate).go().agg[0];
         }
 
         // get smallest value
         this.min = function (predicate) {
-            return this.addAggregate(this.findFirst, aggFuncs.min, predicate).aggGo();
+            return this.addAggregate(Infinity, aggFuncs.min, predicate).go().agg[0];
         }
 
-        // get smallest value
+        // get biggest value
         this.max = function (predicate) {
-            return this.addAggregate(this.findFirst, aggFuncs.max, predicate).aggGo();
+            return this.addAggregate(-Infinity, aggFuncs.max, predicate).go().agg[0];
         }
 
         // average of values
         this.avg = function (predicate) {
-            this.addAggregate(0, aggFuncs.sum, predicate)
+            var result = this.addAggregate(0, aggFuncs.sum, predicate)
                 .addAggregate(0, aggFuncs.count, predicate).go();
 
-            return (this._lastAggResults[1]) ? this._lastAggResults[0] / this._lastAggResults[1] : 0;
+            return (result.agg[1]) ? result.agg[0] / result.agg[1] : 0;
         }
         // variance
         this.var = function (predicate) {
-            var avg = this.avg(predicate);
+            var result = this.addAggregate(0, aggFuncs.sum, predicate)
+                .addAggregate(0, aggFuncs.count, predicate).go();
+
+            var avg = (result.agg[1]) ? result.agg[0] / result.agg[1] : 0;
 
             if (avg) {
-                var avg = (results[1]) ? results[0] / results[1] : 0;
-                return this.addAggregate(0, aggFuncs.sumOfDifferenceSquared, null, avg).aggGo();
+                return result.filtered.addAggregate(0, function (currentSum, value) {
+                    return aggFuncs.sumOfDifferenceSquared(currentSum, value, avg);
+                }).go().agg[0];
             }
 
             return 0;
         }
 
+        // standard deviation
         this.stddev = function (predicate) {
             return Math.sqrt(this.var(predicate));
         }
@@ -469,18 +479,17 @@ Adds functions to array
         // savedName is the name for later
         // query: the function name or function
         // predicate: the predicate to call
-        this.saveQuery = function (savedName, query, predicate, predicateParam) {
+        this.saveQuery = function (savedName, query, predicate) {
             this._savedQueries[savedName] = {
                 query: (typeof query === 'string') ? this[query] : query,
-                predicate: predicate, 
-                predicateParam: predicateParam
+                predicate: predicate
             }
         }
 
         // executes a savedQuery
-        this.execQuery = function (savedName, predicateParam) {
+        this.execQuery = function (savedName) {
             var sq = this.savedQueries[savedName];
-            return sq.query(sq.predicate, predicateParam || sq.predicateParam);
+            return sq.query(sq.predicate);
         }
 
         /********

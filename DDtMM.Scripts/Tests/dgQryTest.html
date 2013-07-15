@@ -27,6 +27,7 @@
             //console.log(b = dgQry(a1).find(function (value) { return (value % 2 == 0); }));
             //console.log(dgQry(a1).exclude(function (value) { return (value % 2 == 0); }).array);
             console.log(b.sum(function (value) { return (value % 2 == 0); }));
+            console.log(b.where(function (value) { return (value % 2 == 0); }).contains(9));
             console.log(b.product());
             console.log(b.avg());
             console.log(dgQry(a1).sum(function (value) { return (value % 2 == 1); }));
@@ -36,7 +37,7 @@
             console.log(dgQry(a1).any(function (value) { return (value % 2 == 1); }));
             console.log(dgQry(a1).all(function (value) { return (value % 2 == 1); }));
             console.log(dgQry(b).all(function (value) { return (value % 2 == 0); }));
-            console.log(dgQry(e).find(function (value) { return (value % 2 == 0); }).toObject());
+            console.log(dgQry(e).where(function (value) { return (value % 2 == 0); }).toObject());
             console.log(a1);
             console.log(a2);
             console.log(dgQry(a1).crossJoin(a2));
