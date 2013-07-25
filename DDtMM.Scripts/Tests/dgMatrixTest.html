@@ -1,0 +1,37 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Test</title>
+    <link href="../Content/Test.css" rel="stylesheet" />
+</head>
+<body>
+    <div id="div1"><span>This is #div1.</span></div>
+    <table id="tbl1">
+        <tbody>
+            <tr><td>#tbl1.r1c1</td><td>#tbl1.r1c2</td></tr>
+            <tr><td>#tbl1.r1c1</td><td>#tbl1.r2c2</td></tr>
+        </tbody>
+    </table>
+
+    <!-- jquery -->
+    <script src="../Scripts/_Required/jquery-1.10.1.js"></script>
+    <script src="../Scripts/_Required/jquery-ui.js"></script>
+    <script src="../Scripts/DataStructures/dgMatrtix-0-1-0.js"></script>
+    <script>
+        var a = new Matrix("1,2:3,4", { rowbreak: /:/g });
+        var b;
+        console.log(a);
+        console.log(a.get(1, 1));
+        console.log(b = a.multiply(a));
+        console.log(a.add(b));
+        console.log(b.sub(a));
+        console.log(b.rotate());
+
+        console.log('Test Rotation');
+        var c = new Matrix("1,2,3\n4,5,6");
+        console.log(c);
+        console.log(c = c.rotate());
+        console.log(c.rotateCounter());
+    </script>
+</body>
+</html>
