@@ -139,13 +139,15 @@ Some useful functions for dealing with block objects
     $.fn.blockUtil = function (method) {
         var jq = this;
       
-        function moveRightOf ($elem, offsetLeft) {
+        function moveRightOf(elem, offsetLeft) {
+            var $elem = elem;
             var pos = $elem.offset();
             pos.left += $elem.width() + (offsetLeft || 0);
 
             return jq.each(function () { $(this).offset(pos); });
         }
-        function moveUnder($elem, offsetTop) {
+        function moveUnder(elem, offsetTop) {
+            var $elem = elem;
             var pos = $elem.offset();
             pos.top += $elem.height() + (offsetTop || 0);
 
