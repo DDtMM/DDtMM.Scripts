@@ -15,7 +15,7 @@ $.widget("dg.simpleTree", {
         dataTemplate: $('<div />', { 'class': 'dg-tree-label' }),
         handleTemplate: $('<div />', { 'class': 'dg-tree-handle' }).html('&nbsp;'),
         nodeTransform: function (oldNode) { return oldNode; },
-        transformGetChildren: function (oldNode) { null; }
+        childrenTransform: function (oldNode) { null; }
     },
 
     _create: function() {
@@ -36,7 +36,7 @@ $.widget("dg.simpleTree", {
     // calls the node TransformMethod;
     _executeNodeTransform: function(oldNode) {
         var node = this.options.nodeTransform(oldNode);
-        var oldChildren = this.options.transformGetChildren(oldNode);
+        var oldChildren = this.options.childrenTransform(oldNode);
         if (oldChildren) {
             node.children = new Array();
             for (var i in oldChildren) {
