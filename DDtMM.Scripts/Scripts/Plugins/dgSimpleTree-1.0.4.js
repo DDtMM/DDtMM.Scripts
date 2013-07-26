@@ -118,7 +118,7 @@ $.widget("dg.simpleTree", {
         if (typeof value == 'object') {
             for (dataID in value) {
                 $labelElement.find('[name="' + dataID + '"]').attr(dataID, value[dataID]);
-                $labelElement.find('[data-dataTemplate-ID="' + dataID + '"').html(value[dataID]);
+                $labelElement.find('[data-tree-key="' + dataID + '"').html(value[dataID]);
             }
         } else {
             $labelElement.html(value);
