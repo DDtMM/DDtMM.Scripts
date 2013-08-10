@@ -434,7 +434,11 @@ $.widget("dg.simpleTree", {
 
     /** SECTION options **/
     _setOption: function (key, value) {
-        this._super(key, value);
+        if (key != 'nodes') {
+            this._super(key, value);
+        } else {
+            this.addNodes(value);
+        }
     },
 
     _setOptions: function (options) {
