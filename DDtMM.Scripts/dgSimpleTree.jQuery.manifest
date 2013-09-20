@@ -1,0 +1,32 @@
+﻿{
+    "name": "dgSimpleTree",
+    "title": "Simple Tree",
+    "description": "Data driven tree view for large data sets",
+    "keywords": [
+        "treeview"
+    ],
+    "version": "1.0.5",
+    "author": {
+        "name": "Daniel Gimenez",
+        "url": "http://daniel.gimenez.biz"
+    },
+    "maintainers": [
+        {
+            "name": "Daniel Gimenez",
+            "email": "danny@gimenez.biz",
+            "url": "http://daniel.gimenez.biz"
+        }
+    ],
+    "licenses": [
+        {
+            "type": "GPL-3.0",
+        }
+    ],
+    "bugs": "https://github.com/DDtMM/DDtMM.Scripts/issues",
+    "homepage": "https://github.com/DDtMM/DDtMM.Scripts/wiki/dgSimpleTree",
+    "docs": "https://github.com/DDtMM/DDtMM.Scripts/wiki/dgSimpleTree",
+    "download": "https://github.com/DDtMM/DDtMM.Scripts/blob/master/DDtMM.Scripts/Scripts/Plugins/dgSimpleTree-1.0.5.js",
+    "dependencies": {
+        "jquery": ">=1.7"
+    }
+}

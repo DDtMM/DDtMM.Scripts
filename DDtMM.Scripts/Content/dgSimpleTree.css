@@ -1,0 +1,44 @@
+﻿.dg-tree
+{
+    margin:0;
+    padding:0;
+    font-family: 'Monaco','Menlo','Ubuntu Mono','Consolas','source-code-pro',monospace;
+}
+.dg-tree ul
+{
+    padding-left:18px;
+}
+.dg-tree li
+{
+    line-height:20px;
+    list-style: none;
+    display: block;
+}
+.dg-tree .dg-tree-list
+{
+
+}
+.dg-tree .dg-tree-handle
+{
+    float: left;
+    min-width: 18px;
+    min-height: 16px;
+    line-height: 100%;
+    cursor:pointer;
+    background-position: 0px center;
+    background-repeat: no-repeat;
+}
+.dg-tree .dg-tree-collapsed > .dg-tree-handle
+{
+    background-image: url(images/icons/icon-plus-16.png);
+}
+.dg-tree .dg-tree-expanded > .dg-tree-handle
+{
+    background-image: url(images/icons/icon-minus-16.png);
+}
+.dg-tree .dg-tree-label
+{
+    cursor:pointer;
+    display: block;
+    padding-left:18px;
+}
